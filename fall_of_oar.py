@@ -2,6 +2,7 @@ import sys
 
 import pygame
 
+from settings import Settings
 
 __metaclass__ = type 
 
@@ -11,8 +12,12 @@ class FallOfOar():
     def __init__(self):
         """Initialize game, create screen objects and other required resources. """
         pygame.init()
-        self.screen = pygame.display.set_mode((1200, 800))
+        self.settings = Settings()
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Fall Of Oar")
+        #add a  background colour
+
 
     def run_game(self):
         """ Runs the main loop for the game. """
@@ -24,6 +29,7 @@ class FallOfOar():
 
             # Display the drawn screen.
             pygame.display.flip()
+
 
 
 
