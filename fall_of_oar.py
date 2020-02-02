@@ -10,6 +10,10 @@ from space_ship import SpaceShip
 from settings import Settings
 
 
+
+from bullet import Bullet
+
+
 __metaclass__ = type 
 
 
@@ -23,21 +27,80 @@ class FallOfOar():
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Fall Of Oar")
-        #add a  background colour
         self.spaceship = SpaceShip(self)
+        self.bullets = pygame.sprite.Group()
+
 
 
     def run_game(self):
         """ Runs the main loop for the game. """
         while True:
-            #Listens for mouse and keyboard events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-            self.spaceship.blitme()
+            self._check_events()
+            self.spaceship.update()
+            self._update_bullets()
+            self._update_screen()
 
-            # Display the drawn screen.
-            pygame.display.flip()
+
+
+    def _check_events(self):
+        """ Listens for keyboard and mouse events"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+            elif event.type == pygame.KEYDOWN:
+                self._check_keydown_events(event)
+
+            elif event.type == pygame.KEYUP:
+                self._check_keyup_events(event)
+
+
+    def _check_keydown_events(self, event):
+        """ Listens and take action on key press events"""
+        if event.key == pygame.K_RIGHT:
+            self.spaceship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.spaceship.moving_left = True
+        elif event.key == pygame.K_x:
+            sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
+
+
+    def _check_keyup_events(self, event):
+        """Listens and take actions on key release events"""
+        if event.key == pygame.K_RIGHT:
+            self.spaceship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.spaceship.moving_left = False
+
+
+
+    def _fire_bullet(self):
+        """Creates new bullet and add it to the bullets group"""
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
+
+    def _update_bullets(self):
+        """ Update the bullets position and deletes old bullets"""
+        self.bullets.update()
+        # Delete bullets no longer showing on the screen
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+
+
+
+
+
+    def _update_screen(self):
+        """ updates the images and draw them to screen"""
+        self.spaceship.blitme()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+        pygame.display.flip()
 
 
 
